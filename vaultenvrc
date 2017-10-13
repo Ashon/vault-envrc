@@ -1,0 +1,18 @@
+#!/bin/bash
+
+if [ "$1" == "" ]; then
+    echo "vaultenvrc v0.1.0: generate .envrc file from vault path"
+    echo "usage: vaultenvrc [vault path]"
+    exit 0
+else
+    if [ -f .envrc ]; then
+        echo ".envrc is already exists."
+        echo "existing .envrc is renamed to .envrc.old"
+        mv .envrc .envrc.old
+    fi
+
+    vault read -format=json $1 | jq -r ".data|to_entries|map(\"\(.key)=\\\"\(.value|tostring)\\\" \")|.[]" > .envrc
+    echo ".envrc is generated"
+    echo
+    cat .envrc
+fi
